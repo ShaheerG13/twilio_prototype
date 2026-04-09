@@ -3,6 +3,7 @@ from flask import Flask, request, render_template
 from twilio.twiml.voice_response import VoiceResponse, Gather
 from twilio.rest import Client
 from dotenv import load_dotenv
+from db import init_db, log_incident, get_all_incidents
 
 load_dotenv()
 
@@ -58,8 +59,19 @@ def handle_input():
         to = worker_number,
     )
 
+    # Log incident to the database
+    log_incident(caller=caller, category=category)
+
     return str(response), 200, {"Content-Type": "text/xml"}
 
 
+@app.route("/incidents")
+def incidents():
+    # Dashboard showing all logged incidents
+    rows = get_all_incidents()
+    return render_template("dashboard.html", incidents=rows)
+
+
 if __name__ == "__main__":
+    init_db()
     app.run(debug=True, port=5000)
