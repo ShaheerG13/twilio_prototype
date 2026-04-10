@@ -1,3 +1,4 @@
 .env
 venv
 incidents.db
+__pycache__/
